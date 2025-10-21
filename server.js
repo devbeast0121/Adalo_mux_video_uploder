@@ -56,6 +56,32 @@ app.post('/api/create-upload', async (req, res) => {
     }
 });
 
+// GET UPLOAD STATUS
+// Check upload and get asset_id
+app.get('/api/upload/:uploadId', async (req, res) => {
+    try {
+        const { uploadId } = req.params;
+        console.log('🔍 Checking upload status:', uploadId);
+
+        const upload = await mux.video.uploads.retrieve(uploadId);
+
+        console.log('📊 Upload status:', upload.status);
+        console.log('📦 Asset ID:', upload.asset_id);
+
+        res.json({
+            success: true,
+            data: upload
+        });
+
+    } catch (error) {
+        console.error('❌ Error getting upload:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // GET ASSET STATUS
 // Check if video is ready for playback
 app.get('/api/asset/:assetId', async (req, res) => {
@@ -139,5 +165,11 @@ app.listen(PORT, () => {
     console.log('📍 Test endpoint: http://localhost:' + PORT + '/');
     console.log('\n✅ Ready to accept requests!\n');
     console.log('🔐 Using Mux Token ID:', process.env.MUX_TOKEN_ID?.substring(0, 10) + '...');
+    console.log('\n📡 Available endpoints:');
+    console.log('  POST   /api/create-upload');
+    console.log('  GET    /api/upload/:uploadId');
+    console.log('  GET    /api/asset/:assetId');
+    console.log('  GET    /api/videos');
+    console.log('  DELETE /api/asset/:assetId');
     console.log('\n');
 });
