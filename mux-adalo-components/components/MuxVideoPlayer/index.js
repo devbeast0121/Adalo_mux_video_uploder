@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const MuxVideoPlayer = ({
@@ -8,31 +8,15 @@ const MuxVideoPlayer = ({
     onPlaybackStarted,
     onPlaybackEnded
 }) => {
-    const videoRef = useRef(null);
-
     useEffect(() => {
-        // Load Mux player script
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@mux/mux-player';
-        script.async = true;
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
+        // Load Mux player script only once
+        if (typeof window !== 'undefined' && !window.document.querySelector('script[src*="mux-player"]')) {
+            const script = window.document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@mux/mux-player';
+            script.async = true;
+            window.document.body.appendChild(script);
+        }
     }, []);
-
-    const handlePlay = () => {
-        if (onPlaybackStarted) {
-            onPlaybackStarted();
-        }
-    };
-
-    const handleEnded = () => {
-        if (onPlaybackEnded) {
-            onPlaybackEnded();
-        }
-    };
 
     if (!playbackId) {
         return (
@@ -44,21 +28,19 @@ const MuxVideoPlayer = ({
         );
     }
 
+    // Create the player HTML
+    const playerHTML = `
+        <mux-player
+            playback-id="${playbackId}"
+            ${autoplay ? 'autoplay' : ''}
+            ${showControls ? 'controls' : ''}
+            style="width: 100%; height: 100%; border-radius: 8px;"
+        ></mux-player>
+    `;
+
     return (
         <View style={styles.container}>
-            <mux-player
-                ref={videoRef}
-                playback-id={playbackId}
-                autoplay={autoplay}
-                controls={showControls}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '8px'
-                }}
-                onPlay={handlePlay}
-                onEnded={handleEnded}
-            />
+            <div dangerouslySetInnerHTML={{ __html: playerHTML }} />
         </View>
     );
 };

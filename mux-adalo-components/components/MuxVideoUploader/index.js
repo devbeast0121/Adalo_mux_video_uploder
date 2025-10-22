@@ -1,35 +1,44 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 
 const MuxVideoUploader = ({
     backendUrl,
     maxFileSize,
-    onUploadComplete,
-    uploadedAssetId,
-    uploadedPlaybackId
+    onUploadComplete
 }) => {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [uploadStatus, setUploadStatus] = useState('');
     const [assetId, setAssetId] = useState('');
     const [playbackId, setPlaybackId] = useState('');
-    const fileInputRef = useRef(null);
 
-    const handleFileSelect = async (event) => {
-        const file = event.target.files[0];
+    const selectFile = () => {
+        // Create file input dynamically
+        const input = window.document.createElement('input');
+        input.type = 'file';
+        input.accept = 'video/*';
 
-        if (!file) return;
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                await handleFileSelect(file);
+            }
+        };
 
+        input.click();
+    };
+
+    const handleFileSelect = async (file) => {
         // Validate file size
         const fileSizeMB = file.size / (1024 * 1024);
         if (fileSizeMB > maxFileSize) {
-            Alert.alert('Error', `File size exceeds ${maxFileSize}MB limit`);
+            alert(`File size exceeds ${maxFileSize}MB limit`);
             return;
         }
 
         // Validate file type
         if (!file.type.startsWith('video/')) {
-            Alert.alert('Error', 'Please select a valid video file');
+            alert('Please select a valid video file');
             return;
         }
 
@@ -42,7 +51,7 @@ const MuxVideoUploader = ({
             setUploadStatus('Creating upload URL...');
             setProgress(10);
 
-            // Step 1: Get upload URL from your backend
+            // Step 1: Get upload URL from backend
             const createResponse = await fetch(`${backendUrl}/api/create-upload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
@@ -76,17 +85,17 @@ const MuxVideoUploader = ({
             setProgress(60);
             setUploadStatus('Processing video...');
 
-            // Step 3: Poll for upload completion and get asset ID
+            // Step 3: Poll for upload completion
             const asset = await pollUploadStatus(uploadId);
 
             setProgress(100);
             setUploadStatus('Upload complete!');
 
-            // Set output values
+            // Set state
             setAssetId(asset.id);
             setPlaybackId(asset.playback_ids[0].id);
 
-            // Trigger Adalo action
+            // Trigger callback
             if (onUploadComplete) {
                 onUploadComplete({
                     assetId: asset.id,
@@ -104,7 +113,7 @@ const MuxVideoUploader = ({
 
         } catch (error) {
             console.error('Upload error:', error);
-            Alert.alert('Upload Error', error.message);
+            alert('Upload Error: ' + error.message);
             setUploading(false);
             setUploadStatus('');
             setProgress(0);
@@ -113,13 +122,12 @@ const MuxVideoUploader = ({
 
     const pollUploadStatus = async (uploadId, maxAttempts = 30) => {
         for (let i = 0; i < maxAttempts; i++) {
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
             const statusResponse = await fetch(`${backendUrl}/api/upload/${uploadId}`);
             const statusData = await statusResponse.json();
 
             if (statusData.success && statusData.data.asset_id) {
-                // Get full asset details
                 const assetResponse = await fetch(`${backendUrl}/api/asset/${statusData.data.asset_id}`);
                 const assetData = await assetResponse.json();
 
@@ -134,17 +142,9 @@ const MuxVideoUploader = ({
 
     return (
         <View style={styles.container}>
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept="video/*"
-                style={{ display: 'none' }}
-                onChange={handleFileSelect}
-            />
-
             <TouchableOpacity
                 style={[styles.uploadButton, uploading && styles.uploadButtonDisabled]}
-                onPress={() => fileInputRef.current?.click()}
+                onPress={selectFile}
                 disabled={uploading}
             >
                 {uploading ? (
