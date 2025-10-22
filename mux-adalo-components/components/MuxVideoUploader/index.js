@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 
-const MuxVideoUploader = ({
-    backendUrl,
-    maxFileSize,
-    onUploadComplete
-}) => {
+const MuxVideoUploader = ({ backendUrl, editor, onUploadComplete }) => {
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [uploadStatus, setUploadStatus] = useState('');
-    const [assetId, setAssetId] = useState('');
-    const [playbackId, setPlaybackId] = useState('');
+    const [localPlaybackId, setLocalPlaybackId] = useState('');
+
+    if (editor) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.editorMode}>
+                    <Text style={styles.editorText}>📹 Mux Video Uploader</Text>
+                    <Text style={styles.editorInfo}>Backend: {backendUrl}</Text>
+                    <Text style={styles.editorHint}>Component will be functional in preview/published app</Text>
+                </View>
+            </View>
+        );
+    }
 
     const selectFile = () => {
-        // Create file input dynamically
+        if (typeof window === 'undefined' || !window.document) return;
+
         const input = window.document.createElement('input');
         input.type = 'file';
         input.accept = 'video/*';
@@ -29,14 +37,12 @@ const MuxVideoUploader = ({
     };
 
     const handleFileSelect = async (file) => {
-        // Validate file size
         const fileSizeMB = file.size / (1024 * 1024);
-        if (fileSizeMB > maxFileSize) {
-            alert(`File size exceeds ${maxFileSize}MB limit`);
+        if (fileSizeMB > 500) {
+            alert('File size exceeds 500MB limit');
             return;
         }
 
-        // Validate file type
         if (!file.type.startsWith('video/')) {
             alert('Please select a valid video file');
             return;
@@ -51,7 +57,6 @@ const MuxVideoUploader = ({
             setUploadStatus('Creating upload URL...');
             setProgress(10);
 
-            // Step 1: Get upload URL from backend
             const createResponse = await fetch(`${backendUrl}/api/create-upload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
@@ -69,13 +74,10 @@ const MuxVideoUploader = ({
             setUploadStatus('Uploading video...');
             setProgress(30);
 
-            // Step 2: Upload file directly to Mux
             const uploadResponse = await fetch(uploadUrl, {
                 method: 'PUT',
                 body: file,
-                headers: {
-                    'Content-Type': file.type
-                }
+                headers: { 'Content-Type': file.type }
             });
 
             if (!uploadResponse.ok) {
@@ -85,31 +87,26 @@ const MuxVideoUploader = ({
             setProgress(60);
             setUploadStatus('Processing video...');
 
-            // Step 3: Poll for upload completion
             const asset = await pollUploadStatus(uploadId);
 
             setProgress(100);
             setUploadStatus('Upload complete!');
 
-            // Set state
-            setAssetId(asset.id);
-            setPlaybackId(asset.playback_ids[0].id);
+            setLocalPlaybackId(asset.playback_ids[0].id);
 
-            // Trigger callback
+            // Trigger callback ONLY ONCE - pass values as separate parameters
             if (onUploadComplete) {
-                onUploadComplete({
-                    assetId: asset.id,
-                    playbackId: asset.playback_ids[0].id,
-                    duration: asset.duration,
-                    status: asset.status
-                });
+                onUploadComplete(
+                    asset.playback_ids[0].id,  // First parameter: playbackId
+                    asset.id                    // Second parameter: assetId
+                );
             }
 
             setTimeout(() => {
                 setUploading(false);
                 setUploadStatus('');
                 setProgress(0);
-            }, 2000);
+            }, 3000);
 
         } catch (error) {
             console.error('Upload error:', error);
@@ -140,6 +137,15 @@ const MuxVideoUploader = ({
         throw new Error('Upload processing timeout');
     };
 
+    const copyToClipboard = (text) => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+            alert('✅ Playback ID copied to clipboard!');
+        } else {
+            alert('❌ Copy not supported in this browser');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -148,7 +154,7 @@ const MuxVideoUploader = ({
                 disabled={uploading}
             >
                 {uploading ? (
-                    <ActivityIndicator color="#fff" />
+                    <ActivityIndicator color="#fff" size="small" />
                 ) : (
                     <Text style={styles.uploadButtonText}>📹 Select Video to Upload</Text>
                 )}
@@ -164,11 +170,15 @@ const MuxVideoUploader = ({
                 </View>
             )}
 
-            {assetId && !uploading && (
+            {localPlaybackId && !uploading && (
                 <View style={styles.successContainer}>
-                    <Text style={styles.successText}>✅ Video uploaded successfully!</Text>
-                    <Text style={styles.infoText}>Asset ID: {assetId}</Text>
-                    <Text style={styles.infoText}>Playback ID: {playbackId}</Text>
+                    <Text style={styles.successText}>✅ Upload Complete!</Text>
+                    <TouchableOpacity
+                        style={styles.copyButton}
+                        onPress={() => copyToClipboard(localPlaybackId)}
+                    >
+                        <Text style={styles.copyButtonText}>📋 Copy Playback ID</Text>
+                    </TouchableOpacity>
                 </View>
             )}
         </View>
@@ -180,6 +190,28 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f5f5f5',
         borderRadius: 10,
+        minHeight: 150,
+    },
+    editorMode: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    editorText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    editorInfo: {
+        fontSize: 12,
+        color: '#666',
+        marginBottom: 5,
+    },
+    editorHint: {
+        fontSize: 11,
+        color: '#999',
+        fontStyle: 'italic',
+        marginTop: 10,
     },
     uploadButton: {
         backgroundColor: '#6366f1',
@@ -236,6 +268,25 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#047857',
         marginTop: 5,
+        wordBreak: 'break-all',
+    },
+    copyHint: {
+        fontSize: 10,
+        color: '#059669',
+        marginTop: 5,
+        fontStyle: 'italic',
+    },
+    copyButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#059669',
+        borderRadius: 6,
+        alignItems: 'center',
+    },
+    copyButtonText: {
+        color: '#fff',
+        fontSize: 13,
+        fontWeight: '600',
     },
 });
 

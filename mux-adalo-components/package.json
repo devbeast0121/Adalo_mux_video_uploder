@@ -1,20 +1,26 @@
 {
-  "name": "mux-video-components",
-  "version": "1.0.0",
-  "description": "Upload and play videos using Mux",
-  "author": "",
-  "license": "ISC",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "react": "^17.0.2",
-    "react-native": "^0.64.3",
-    "react-native-web": "^0.17.7"
-  },
-  "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-native": ">=0.64.0"
-  }
+    "name": "mux-adalo-components",
+    "version": "1.0.0",
+    "description": "Mux video upload and playback components for Adalo",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "react": ">=17.0.0",
+        "react-native": ">=0.64.0",
+        "react-native-web": "^0.17.7"
+    },
+    "peerDependencies": {
+        "react": ">=17.0.0",
+        "react-native": ">=0.64.0"
+    },
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.28.4",
+        "@babel/preset-env": "^7.28.3",
+        "@babel/preset-react": "^7.27.1",
+        "babel-loader": "^10.0.0"
+    }
 }

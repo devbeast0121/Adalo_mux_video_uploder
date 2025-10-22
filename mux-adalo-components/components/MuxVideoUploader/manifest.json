@@ -1,44 +1,37 @@
 {
     "displayName": "Mux Video Uploader",
-    "description": "Upload videos directly to Mux",
+    "description": "Upload videos to Mux",
     "icon": "video-camera",
+    "defaultWidth": 300,
+    "defaultHeight": 200,
+    "resizeX": true,
+    "resizeY": true,
     "props": [
         {
             "name": "backendUrl",
             "displayName": "Backend Server URL",
             "type": "text",
-            "default": "http://localhost:3000",
-            "required": true,
+            "default": "http://localhost:8080",
             "role": "text",
             "description": "Your Node.js backend URL"
         },
         {
-            "name": "maxFileSize",
-            "displayName": "Max File Size (MB)",
-            "type": "number",
-            "default": 500,
-            "role": "number"
-        },
-        {
             "name": "onUploadComplete",
-            "displayName": "Upload Complete Action",
+            "displayName": "On Upload Complete",
             "type": "action",
-            "description": "Triggered when upload finishes"
-        },
-        {
-            "name": "uploadedAssetId",
-            "displayName": "Asset ID",
-            "type": "text",
-            "role": "output",
-            "description": "Mux asset ID after upload"
-        },
-        {
-            "name": "uploadedPlaybackId",
-            "displayName": "Playback ID",
-            "type": "text",
-            "role": "output",
-            "description": "Mux playback ID for video player"
+            "description": "Action triggered when upload completes",
+            "arguments": [
+                {
+                    "name": "playbackId",
+                    "displayName": "Playback ID",
+                    "type": "text"
+                },
+                {
+                    "name": "assetId",
+                    "displayName": "Asset ID",
+                    "type": "text"
+                }
+            ]
         }
-    ],
-    "childComponents": []
+    ]
 }

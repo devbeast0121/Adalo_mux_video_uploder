@@ -1,20 +1,20 @@
 {
-  "displayName": "Mux Video Components",
-  "description": "Upload and play videos using Mux",
-  "version": "1.0.0",
-  "components": [
-    {
-      "name": "MuxVideoUploader",
-      "manifest": "./components/MuxVideoUploader/manifest.json"
-    },
-    {
-      "name": "MuxVideoPlayer",
-      "manifest": "./components/MuxVideoPlayer/manifest.json"
-    }
-  ],
-  "author": "The Uncoders",
-  "details": "Upload and play videos using Mux",
-  "logo": "./logo.png",
-  "demoAppURL": "https://previewer.adalo.com/1f4a64f2-8ccd-4660-a0e0-2be2ab124b88",
-  "supportURL": "https://tally.so/r/3jyvD1"
+    "displayName": "Mux Video Components",
+    "description": "Upload and play videos using Mux",
+    "version": "1.0.0",
+    "components": [
+        {
+            "name": "MuxVideoUploader",
+            "manifest": "./components/MuxVideoUploader/manifest.json"
+        },
+        {
+            "name": "MuxVideoPlayer",
+            "manifest": "./components/MuxVideoPlayer/manifest.json"
+        }
+    ],
+    "author": "The Uncoders",
+    "details": "Upload and play videos using Mux",
+    "logo": "./logo.png",
+    "demoAppURL": "https://previewer.adalo.com/1f4a64f2-8ccd-4660-a0e0-2be2ab124b88",
+    "supportURL": "https://tally.so/r/3jyvD1"
 }
