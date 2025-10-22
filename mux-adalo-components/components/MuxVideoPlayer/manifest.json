@@ -1,0 +1,40 @@
+{
+    "displayName": "Mux Video Player",
+    "description": "Play Mux videos on-demand",
+    "icon": "play-circle",
+    "props": [
+        {
+            "name": "playbackId",
+            "displayName": "Playback ID",
+            "type": "text",
+            "required": true,
+            "role": "text",
+            "description": "Mux playback ID from uploader"
+        },
+        {
+            "name": "autoplay",
+            "displayName": "Autoplay",
+            "type": "boolean",
+            "default": false,
+            "role": "switch"
+        },
+        {
+            "name": "showControls",
+            "displayName": "Show Controls",
+            "type": "boolean",
+            "default": true,
+            "role": "switch"
+        },
+        {
+            "name": "onPlaybackStarted",
+            "displayName": "On Play",
+            "type": "action"
+        },
+        {
+            "name": "onPlaybackEnded",
+            "displayName": "On End",
+            "type": "action"
+        }
+    ],
+    "childComponents": []
+}

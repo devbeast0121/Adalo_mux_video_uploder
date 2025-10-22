@@ -1,0 +1,44 @@
+{
+    "displayName": "Mux Video Uploader",
+    "description": "Upload videos directly to Mux",
+    "icon": "video-camera",
+    "props": [
+        {
+            "name": "backendUrl",
+            "displayName": "Backend Server URL",
+            "type": "text",
+            "default": "http://localhost:3000",
+            "required": true,
+            "role": "text",
+            "description": "Your Node.js backend URL"
+        },
+        {
+            "name": "maxFileSize",
+            "displayName": "Max File Size (MB)",
+            "type": "number",
+            "default": 500,
+            "role": "number"
+        },
+        {
+            "name": "onUploadComplete",
+            "displayName": "Upload Complete Action",
+            "type": "action",
+            "description": "Triggered when upload finishes"
+        },
+        {
+            "name": "uploadedAssetId",
+            "displayName": "Asset ID",
+            "type": "text",
+            "role": "output",
+            "description": "Mux asset ID after upload"
+        },
+        {
+            "name": "uploadedPlaybackId",
+            "displayName": "Playback ID",
+            "type": "text",
+            "role": "output",
+            "description": "Mux playback ID for video player"
+        }
+    ],
+    "childComponents": []
+}
