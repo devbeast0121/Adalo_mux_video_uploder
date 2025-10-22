@@ -1,6 +1,6 @@
 {
     "name": "mux-adalo-components",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Mux video upload and playback components for Adalo",
     "main": "index.js",
     "scripts": {

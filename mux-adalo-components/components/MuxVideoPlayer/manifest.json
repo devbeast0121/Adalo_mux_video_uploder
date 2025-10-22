@@ -1,7 +1,7 @@
 {
     "displayName": "Mux Video Player",
     "description": "Play Mux videos",
-    "icon": "play-circle",
+    "icon": "play-circle.png",
     "defaultWidth": 300,
     "defaultHeight": 200,
     "resizeX": true,

@@ -1,7 +1,7 @@
 {
     "displayName": "Mux Video Uploader",
     "description": "Upload videos to Mux",
-    "icon": "video-camera",
+    "icon": "video-camera.png",
     "defaultWidth": 300,
     "defaultHeight": 200,
     "resizeX": true,
